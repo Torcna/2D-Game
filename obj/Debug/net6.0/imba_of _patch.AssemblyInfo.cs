@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("imba_of _patch")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f19eb426a32e1e092b726af92d6b6686dadbe54f")]
 [assembly: System.Reflection.AssemblyProductAttribute("imba_of _patch")]
 [assembly: System.Reflection.AssemblyTitleAttribute("imba_of _patch")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

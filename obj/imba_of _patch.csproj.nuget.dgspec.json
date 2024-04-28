@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\79065\\OneDrive\\Рабочий стол\\C# progs\\imba_of _patch\\imba_of _patch.csproj": {}
+    "C:\\Users\\Shcololo\\Desktop\\progs\\game_yeah\\imba_of _patch.csproj": {}
   },
   "projects": {
-    "C:\\Users\\79065\\OneDrive\\Рабочий стол\\C# progs\\imba_of _patch\\imba_of _patch.csproj": {
+    "C:\\Users\\Shcololo\\Desktop\\progs\\game_yeah\\imba_of _patch.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\79065\\OneDrive\\Рабочий стол\\C# progs\\imba_of _patch\\imba_of _patch.csproj",
+        "projectUniqueName": "C:\\Users\\Shcololo\\Desktop\\progs\\game_yeah\\imba_of _patch.csproj",
         "projectName": "imba_of _patch",
-        "projectPath": "C:\\Users\\79065\\OneDrive\\Рабочий стол\\C# progs\\imba_of _patch\\imba_of _patch.csproj",
-        "packagesPath": "C:\\Users\\79065\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\79065\\OneDrive\\Рабочий стол\\C# progs\\imba_of _patch\\obj\\",
+        "projectPath": "C:\\Users\\Shcololo\\Desktop\\progs\\game_yeah\\imba_of _patch.csproj",
+        "packagesPath": "C:\\Users\\Shcololo\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Shcololo\\Desktop\\progs\\game_yeah\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\79065\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Shcololo\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -34,6 +34,11 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -60,12 +65,30 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[6.0.28, 6.0.28]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[6.0.28, 6.0.28]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[6.0.28, 6.0.28]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[6.0.28, 6.0.28]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.401\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.202\\RuntimeIdentifierGraph.json"
         }
       }
     }

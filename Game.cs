@@ -21,7 +21,11 @@ namespace imba_of_patch
     {
         int screenWidth;
         int screenHeight;
-        
+        public static float frameTimne = 0;
+        int fps = 0;
+
+        public static bool flag_dead = false;
+        public float speed_for_ball = 0;
 
         int factor = 0;
         class models
@@ -57,7 +61,9 @@ namespace imba_of_patch
                 return texture_id;
             }
         }
+
         
+
         class player: models
         {
             public int vao_player;
@@ -289,15 +295,16 @@ namespace imba_of_patch
             public int el_buff;
             public int id_texture;
 
-            public float[] vert =
-            {
-                0.9f, -0.5f, 0f, // top left vertex - 0
-                0.6f, -0.5f, 0f, // top right vertex - 1
-                0.6f, -0.8f, 0f, // bottom right - 2
-                0.9f, -0.8f, 0f
-            };
 
-            float[] texture_coord =
+
+            public float[] vert=new float[12];
+            
+            public float enemy_x_left;
+            public float enemy_x_right;
+            public float enemy_y_bottom;
+            public float enemy_y_top;
+
+			float[] texture_coord =
             {
                 0f, 1f,
                 1f, 1f,
@@ -310,13 +317,47 @@ namespace imba_of_patch
                 2,3,0
             };
 
+            public enemy()
+            {
+				Random rnd = new Random();
+                float x = (float)rnd.NextDouble()%0.7f;
+                if (rnd.NextDouble()>=0.5)
+                    x*=-1;
+				float y = (float)rnd.NextDouble()%0.7f;
+				if (rnd.NextDouble() >= 0.5)
+					y*= -1;
+
+                vert[0]= x;
+                vert[1]= y+0.3f;
+                vert[2]=0;
+                vert[3]= x+0.3f;
+                vert[4]= y + 0.3f;
+				vert[5]= 0;
+                vert[6]= x+0.3f;
+                vert[7]= y;
+                vert[8] = 0;
+                vert[9] = x;
+                vert[10] = y;
+                vert[11] = 0;
+                
+                
+            }
+            
+        
+    
             public void load()
             {
                 vao_enemy=GL.GenVertexArray();
                 GL.BindVertexArray(vao_enemy);
+                enemy_x_left = vert[0];
+                enemy_x_right = vert[3];
+                enemy_y_bottom = vert[7];
+                enemy_y_top = vert[4];
+
+				
 
 
-                vbo_enemy_vert=GL.GenBuffer();
+				vbo_enemy_vert =GL.GenBuffer();
 
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, vbo_enemy_vert);
@@ -347,18 +388,22 @@ namespace imba_of_patch
 
             public void draw()
             {
-                GL.BindVertexArray(vao_enemy);
-                GL.BindBuffer(BufferTarget.ElementArrayBuffer, el_buff);
+                if (vao_enemy != 0)
+                {
+                    GL.BindVertexArray(vao_enemy);
+                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, el_buff);
 
-                GL.BindTexture(TextureTarget.Texture2D, id_texture);
+                    GL.BindTexture(TextureTarget.Texture2D, id_texture);
 
-                GL.DrawElements(BeginMode.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
+                    GL.DrawElements(BeginMode.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
+                }
             }
             public void delete()
             {
                 GL.DeleteVertexArray(vao_enemy);
+                vao_enemy = 0;
                 GL.DeleteBuffer(vbo_enemy_tex);
-                GL.DeleteTexture(vbo_enemy_vert);
+                GL.DeleteTexture(id_texture);
             }
         }
 
@@ -370,8 +415,9 @@ namespace imba_of_patch
             int el_buff;
             int id_texture;
 
-            //phys
-            float speed = 0.8f;
+			public float timestamp = 0;
+			//phys
+			public float speed = 0f;
             public bool flag_ball = false;
 
            
@@ -409,7 +455,8 @@ namespace imba_of_patch
             float time =0f;
             public void load()
             {
-                vao_fireball = GL.GenVertexArray();
+                timestamp = frameTimne;
+				vao_fireball = GL.GenVertexArray();
                 GL.BindVertexArray(vao_fireball);
                 vbo_fireball_vert = GL.GenBuffer();
                 GL.BindBuffer(BufferTarget.ArrayBuffer, vbo_fireball_vert);
@@ -438,52 +485,63 @@ namespace imba_of_patch
                 id_texture = attach_texture("../../../textures/fireball.png", id_texture);
             }
 
-            public void draw(int location)
+            public void draw(int location,enemy sminem)
             {
-                max_t = (float)(speed*Math.Sin(MathHelper.DegreesToRadians(angle_trajectory))/0.3);
-
-
-                GL.BindVertexArray(vao_fireball);
-                GL.BindBuffer(BufferTarget.ElementArrayBuffer, el_buff);
-
-
-
-                GL.BindTexture(TextureTarget.Texture2D, id_texture);
-
-                var tm = Matrix4.CreateRotationZ(MathHelper.DegreesToRadians(rotate_ball));
-
-                float tr_x = (float)(-0.8f+(0.2f * Math.Cos(MathHelper.DegreesToRadians(angle_trajectory))) +(speed*Math.Cos(MathHelper.DegreesToRadians(angle_trajectory))*time));
-                float tr_y =(float)( -0.8f+0.2f * Math.Sin(MathHelper.DegreesToRadians(angle_trajectory)) +(speed*Math.Sin(MathHelper.DegreesToRadians(angle_trajectory)*time) - 0.3*Math.Pow(time,2)/2));
-
-                tm= tm * Matrix4.CreateTranslation(tr_x, tr_y, 0f);
-                GL.UniformMatrix4(location, true, ref tm);
-
-
-                GL.DrawElements(BeginMode.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
-                time+=0.01f;
-                float dx = 1;
-                float dy = (float)((speed*Math.Sin(MathHelper.DegreesToRadians(angle_trajectory)) - 0.3*time));
-                float dypodx = dy/dx;
-                if (rotate_ball>-135)
+                if (vao_fireball != 0)
                 {
-                    
-                    rotate_ball-=1.5f*(float)(Math.Atan(dypodx));
+
+
+                    max_t = (float)(speed * Math.Sin(MathHelper.DegreesToRadians(angle_trajectory)) / 0.3);
+
+
+                    GL.BindVertexArray(vao_fireball);
+                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, el_buff);
+
+
+
+                    GL.BindTexture(TextureTarget.Texture2D, id_texture);
+
+                    var tm = Matrix4.CreateRotationZ(MathHelper.DegreesToRadians(rotate_ball));
+
+                    float tr_x = (float)(-0.8f + (0.2f * Math.Cos(MathHelper.DegreesToRadians(angle_trajectory))) + (speed * Math.Cos(MathHelper.DegreesToRadians(angle_trajectory)) * time));
+                    float tr_y = (float)(-0.8f + 0.2f * Math.Sin(MathHelper.DegreesToRadians(angle_trajectory)) + (speed * Math.Sin(MathHelper.DegreesToRadians(angle_trajectory) * time) - 0.3 * Math.Pow(time, 2) / 2));
+
+                    tm = tm * Matrix4.CreateTranslation(tr_x, tr_y, 0f);
+                    GL.UniformMatrix4(location, true, ref tm);
+
+
+                    GL.DrawElements(BeginMode.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
+                    if (tr_x + 0.1f >= sminem.enemy_x_left && (tr_y + 0.1f >= sminem.enemy_y_bottom && tr_y - 0.1f <= sminem.enemy_y_top))
+                    {
+                         flag_dead = true;
+                         flag_ball=false;
+
+					}
+                    time += 0.01f;
+                    float dx =(float) (speed * Math.Cos(MathHelper.DegreesToRadians(angle_trajectory)));
+
+					float dy = (float)((speed * Math.Sin(MathHelper.DegreesToRadians(angle_trajectory)) - 0.3 * time));
+                    float dypodx = dy / dx;
+                    if (rotate_ball > -135)
+                    {
+                        
+                        rotate_ball -= (float)(Math.Atan(dypodx));
+                    }
+
+
+                    if (Math.Abs(tr_x) > 1 || Math.Abs(tr_y) > 1)
+                    {
+                        flag_ball = false;
+                    }
+
+
                 }
-                
-                
-                if (Math.Abs(tr_x)>1 || Math.Abs(tr_y)>1)
-                {
-                    flag_ball=true;
-                    delete();
-                }
-
-
-
             }
 
             public void delete()
             {
                 GL.DeleteVertexArray(vao_fireball);
+                vao_fireball = 0;
                 GL.DeleteBuffer(vbo_fireball_text);
                 GL.DeleteTexture(vbo_fireball_vert);
             }
@@ -560,9 +618,24 @@ namespace imba_of_patch
 
 
             back_g.draw();
-            sminem.draw();
-            character.draw(location);
-            if (ball.flag_ball)
+            if (!flag_dead)
+            {
+				sminem.draw();
+			}
+            else
+            {
+                sminem.delete();
+                enemy temp = new enemy();
+
+                sminem = temp;
+                sminem.load();
+                sminem.draw();
+                flag_dead = false;
+            }
+			character.draw(location);
+
+			
+			if (ball.flag_ball)
             {
                 if (!ball.flag_set_angle)
                 {
@@ -571,7 +644,7 @@ namespace imba_of_patch
                     ball.rotate_ball+=ball.angle_trajectory;
                 }
                     
-                ball.draw(location);
+                ball.draw(location,sminem);
                 
             }
             
@@ -585,6 +658,15 @@ namespace imba_of_patch
 
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
+
+            frameTimne  += (float)args.Time;
+            fps++;
+            if (frameTimne>=1f)
+            {
+                Title = $"Yeah FPS - {fps}";
+                fps = 0;
+                frameTimne = 0;
+			}
             
             factor++;
             if (factor == 10)
@@ -627,10 +709,20 @@ namespace imba_of_patch
                 Close();
             if (IsKeyDown(Keys.Space))
             {
-                ball = new fireball();
-                ball.load();
-                ball.flag_ball = true;
+                speed_for_ball += 0.015f;
             }
+            if (IsKeyReleased(Keys.Space))
+            {
+				if (ball.flag_ball == false)
+				{
+					ball = new fireball();
+					ball.load();
+				}
+                ball.speed = speed_for_ball;
+
+                ball.flag_ball = true;
+                speed_for_ball = 0f;
+			}
         }
 
 
